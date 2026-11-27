@@ -1,5 +1,5 @@
-import { Loader2, X } from 'lucide-react'
-import { useEffect, useRef, type ButtonHTMLAttributes, type ComponentProps, type ReactNode } from 'react'
+import { Eye, EyeOff, Loader2, X } from 'lucide-react'
+import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ComponentProps, type ReactNode } from 'react'
 import type { MessageStatus, QueueStatus } from '../lib/types'
 
 export const cx = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(' ')
@@ -70,7 +70,27 @@ const inputClass =
 
 export const Input = ({ className, ...p }: ComponentProps<'input'>) => <input className={cx(inputClass, className)} {...p} />
 export const Textarea = ({ className, ...p }: ComponentProps<'textarea'>) => <textarea className={cx(inputClass, className)} {...p} />
-export const Select = ({ className, ...p }: ComponentProps<'select'>) => <select className={cx(inputClass, className)} {...p} />
+/** Password field with a show/hide toggle, so staff can check what they typed. */
+export function PasswordInput({ className, ...p }: Omit<ComponentProps<'input'>, 'type'>) {
+  const [visible, setVisible] = useState(false)
+  return (
+    <div className="relative">
+      <input type={visible ? 'text' : 'password'} className={cx(inputClass, 'pr-11', className)} {...p} />
+      <button
+        type="button"
+        onClick={() => setVisible((v) => !v)}
+        aria-label={visible ? 'Hide password' : 'Show password'}
+        aria-pressed={visible}
+        title={visible ? 'Hide password' : 'Show password'}
+        className="absolute inset-y-0 right-0 flex w-10 items-center justify-center rounded-r-lg text-ink-muted hover:text-ink"
+      >
+        {visible ? <EyeOff className="size-4" aria-hidden /> : <Eye className="size-4" aria-hidden />}
+      </button>
+    </div>
+  )
+}
+
+export const Select =({ className, ...p }: ComponentProps<'select'>) => <select className={cx(inputClass, className)} {...p} />
 
 export function Spinner({ label }: { label?: string }) {
   return (

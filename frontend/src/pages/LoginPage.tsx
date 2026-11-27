@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Navigate } from 'react-router'
 import { useAuth } from '../auth/AuthContext'
-import { Button, Card, ErrorBanner, Field, Input } from '../components/ui'
+import { Button, Card, ErrorBanner, Field, Input, PasswordInput } from '../components/ui'
 import { homePathFor } from '../lib/roles'
 
 /** One shared staff login. After sign-in, staff are routed to the dashboard for their role. */
@@ -39,7 +39,7 @@ export function LoginPage() {
           <form onSubmit={submit} className="space-y-4">
             {(error || (status === 'error' && authError)) && <ErrorBanner>{error ?? authError}</ErrorBanner>}
             <Field label="Email"><Input type="email" required autoComplete="username" autoFocus value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
-            <Field label="Password"><Input type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
+            <Field label="Password"><PasswordInput required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
             <Button type="submit" size="lg" className="w-full" loading={busy || (status === 'loading' && !!email)}>Sign in</Button>
           </form>
         </Card>

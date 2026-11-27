@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import { supabase } from '../lib/supabase'
 import { useToast } from './Toast'
-import { Button, ErrorBanner, Field, Input } from './ui'
+import { Button, ErrorBanner, Field, PasswordInput } from './ui'
 
 export const MIN_PASSWORD_LENGTH = 8
 
@@ -47,13 +47,13 @@ export function ChangePasswordForm({ onDone }: { onDone?: () => void }) {
     <form onSubmit={submit} className="space-y-4">
       {error && <ErrorBanner>{error}</ErrorBanner>}
       <Field label="Current password">
-        <Input type="password" required autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} />
+        <PasswordInput required autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} />
       </Field>
       <Field label="New password" hint={`At least ${MIN_PASSWORD_LENGTH} characters`}>
-        <Input type="password" required autoComplete="new-password" value={next} onChange={(e) => setNext(e.target.value)} />
+        <PasswordInput required autoComplete="new-password" value={next} onChange={(e) => setNext(e.target.value)} />
       </Field>
       <Field label="Confirm new password">
-        <Input type="password" required autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
+        <PasswordInput required autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} />
       </Field>
       <Button type="submit" loading={busy}>Change password</Button>
     </form>
