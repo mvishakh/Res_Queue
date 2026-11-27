@@ -26,3 +26,9 @@ coverage/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Supabase personal access token (setup only — revoke after use)
+.supabase-token
+
+# Generated owner credentials (bootstrap --password-file)
+.owner-password*

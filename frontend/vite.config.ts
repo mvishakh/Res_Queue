@@ -4,7 +4,8 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  server: { port: 5173 },
+  // Bind IPv4 explicitly: on Windows "localhost" may otherwise bind only to [::1].
+  server: { host: '127.0.0.1', port: 5173, strictPort: true },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],

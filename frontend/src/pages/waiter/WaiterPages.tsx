@@ -1,5 +1,6 @@
 import { LogOut } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
+import { ChangePasswordForm } from '../../components/ChangePasswordForm'
 import { TableCard, useMarkAvailable } from '../../components/TableCard'
 import { Badge, Button, Card, EmptyState, ErrorBanner, PageHeader, Select, Spinner } from '../../components/ui'
 import { errorMessage } from '../../lib/api'
@@ -139,6 +140,10 @@ export function WaiterProfilePage() {
           </Select>
         )}
         <Button variant="secondary" onClick={() => signOut()}><LogOut className="size-4" aria-hidden /> Sign out</Button>
+      </Card>
+      <Card className="mt-4 max-w-md p-5">
+        <h2 className="mb-4 font-semibold">Change password</h2>
+        <ChangePasswordForm />
       </Card>
     </>
   )

@@ -54,6 +54,7 @@ restaurants 1─1 whatsapp_configurations ; restaurants 1─* activity_logs
 | `0001` | All tables, enums, indexes and constraints |
 | `0002` | `smartqueue_check_allocation()` trigger: capacity ≥ party size and same-restaurant references |
 | `0003` | RLS on every table. **On Supabase only:** `smartqueue_staff_role()` helper, read-only policies for realtime tables, revoke of anon/authenticated privileges, Realtime publication |
+| `0004` | RLS on `alembic_version` and revoke of browser-role access to it (Supabase grants new `public` tables to `anon`/`authenticated` by default) |
 
 ```bash
 alembic upgrade head      # apply

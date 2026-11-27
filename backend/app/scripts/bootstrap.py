@@ -8,12 +8,13 @@ Usage (from backend/, with .env configured):
         --tables "T1:2,T2:2,T3:4,T4:4,T5:6"
 
 If the owner does not yet exist in Supabase Auth you will be prompted for a password
-(requires SUPABASE_SERVICE_ROLE_KEY). Further staff are added from Settings → Staff.
+(requires SUPABASE_SERVICE_ROLE_KEY). Further staff are added from Settings > Staff.
 """
 
 import argparse
 import getpass
 import re
+import secrets
 import uuid
 
 from sqlalchemy import func, select
@@ -41,6 +42,11 @@ def main() -> None:
     p.add_argument("--owner-email", required=True)
     p.add_argument("--owner-name", required=True)
     p.add_argument("--tables", default="", help='e.g. "T1:2,T2:4,T3:6"')
+    p.add_argument(
+        "--password-file",
+        help="Non-interactive: if the owner must be created, generate a temporary password "
+        "and write it to this file (keep it out of git; change the password after first login)",
+    )
     args = p.parse_args()
 
     if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", args.slug):
@@ -55,11 +61,18 @@ def main() -> None:
         if profile is None:
             user_id = supabase_admin.find_auth_user_id(email)
             if user_id is None:
-                password = getpass.getpass(f"Password for new Supabase user {email}: ")
+                if args.password_file:
+                    password = secrets.token_urlsafe(18)
+                    with open(args.password_file, "w", encoding="utf-8") as fh:
+                        fh.write(f"ResQ / Smart Queue owner login\nemail: {email}\ntemporary password: {password}\n"
+                                 "Change it after first login, then delete this file.\n")
+                else:
+                    password = getpass.getpass(f"Password for new Supabase user {email}: ")
                 if len(password) < 8:
                     raise SystemExit("Password must be at least 8 characters")
                 user_id = supabase_admin.create_auth_user(email, password, args.owner_name)
-                print(f"Created Supabase Auth user {email}")
+                print(f"Created Supabase Auth user {email}"
+                      + (f" (temporary password written to {args.password_file})" if args.password_file else ""))
             profile = StaffProfile(id=uuid.UUID(user_id), email=email, full_name=args.owner_name)
             db.add(profile)
 

@@ -1,10 +1,11 @@
 import {
-  BarChart3, ClipboardList, History, LayoutDashboard, LayoutGrid, LogOut, Menu as MenuIcon, Settings, UserPlus, Users, UtensilsCrossed, X,
+  BarChart3, ClipboardList, History, KeyRound, LayoutDashboard, LayoutGrid, LogOut, Menu as MenuIcon, Settings, UserPlus, Users, UtensilsCrossed, X,
 } from 'lucide-react'
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router'
 import { useAuth } from '../auth/AuthContext'
-import { cx } from '../components/ui'
+import { ChangePasswordForm } from '../components/ChangePasswordForm'
+import { cx, Modal } from '../components/ui'
 import { useRealtimeSync } from '../lib/realtime'
 import { isOwner, ROLE_LABELS } from '../lib/roles'
 
@@ -12,6 +13,7 @@ import { isOwner, ROLE_LABELS } from '../lib/roles'
 export function QueueManagerLayout() {
   const { me, membership, signOut } = useAuth()
   const [open, setOpen] = useState(false)
+  const [passwordOpen, setPasswordOpen] = useState(false)
   useRealtimeSync(membership?.restaurant_id, membership?.role)
 
   const nav = [
@@ -58,7 +60,10 @@ export function QueueManagerLayout() {
       <div className="border-t border-line p-4">
         <p className="truncate text-sm font-medium">{me?.full_name}</p>
         <p className="text-xs text-ink-muted">{membership && ROLE_LABELS[membership.role]}</p>
-        <button onClick={() => signOut()} className="mt-3 flex items-center gap-2 text-sm text-ink-muted hover:text-ink">
+        <button onClick={() => { setOpen(false); setPasswordOpen(true) }} className="mt-3 flex items-center gap-2 text-sm text-ink-muted hover:text-ink">
+          <KeyRound className="size-4" aria-hidden /> Change password
+        </button>
+        <button onClick={() => signOut()} className="mt-2 flex items-center gap-2 text-sm text-ink-muted hover:text-ink">
           <LogOut className="size-4" aria-hidden /> Sign out
         </button>
       </div>
@@ -84,6 +89,9 @@ export function QueueManagerLayout() {
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           <Outlet />
         </main>
+        <Modal open={passwordOpen} title="Change password" onClose={() => setPasswordOpen(false)}>
+          <ChangePasswordForm onDone={() => setPasswordOpen(false)} />
+        </Modal>
       </div>
     </div>
   )

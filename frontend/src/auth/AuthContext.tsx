@@ -49,8 +49,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const userId = session?.user.id
+  // Must be a dependency: "not signed in" has userId === undefined both before and after
+  // Supabase reports the session, so userId alone would never re-run this effect.
+  const sessionKnown = session !== undefined
   useEffect(() => {
-    if (session === undefined) return
+    if (!sessionKnown) return
     if (!userId) {
       queryClient.clear() // never show one user's cached data to the next
       setMe(null)
@@ -77,8 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId])
+  }, [sessionKnown, userId, queryClient])
 
   const membership = useMemo(() => {
     if (!me?.memberships.length) return null
