@@ -140,13 +140,21 @@ export const MessageStatusBadge = ({ status, title }: { status: MessageStatus; t
 
 export function Modal({ open, title, onClose, children, footer }: { open: boolean; title: string; onClose: () => void; children: ReactNode; footer?: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null)
+  // Latest onClose without re-running effects: callers pass a new arrow function on every
+  // render (i.e. on every keystroke), and re-running the focus effect would pull focus out
+  // of the field being typed in.
+  const onCloseRef = useRef(onClose)
+  useEffect(() => {
+    onCloseRef.current = onClose
+  })
   useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onCloseRef.current()
     document.addEventListener('keydown', onKey)
-    ref.current?.focus()
+    // Focus the dialog once when it opens, unless a field inside it (autoFocus) already has focus.
+    if (ref.current && !ref.current.contains(document.activeElement)) ref.current.focus()
     return () => document.removeEventListener('keydown', onKey)
-  }, [open, onClose])
+  }, [open])
   if (!open) return null
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 sm:items-center sm:p-4" onMouseDown={onClose}>
