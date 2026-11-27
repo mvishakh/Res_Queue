@@ -1,0 +1,63 @@
+# Render Blueprint — Smart Queue backend (API + Celery worker).
+# Secrets use `sync: false`: Render asks for their values when the Blueprint is created.
+# Database = Supabase PostgreSQL, Redis = Upstash. See docs/DEPLOYMENT_GUIDE.md.
+
+envVarGroups:
+  - name: smart-queue-shared
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_JWT_SECRET
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        value: menu-images
+      - key: REDIS_URL
+        sync: false
+      - key: PUBLIC_APP_URL
+        sync: false
+      - key: WHATSAPP_API_VERSION
+        value: v23.0
+      - key: WHATSAPP_ACCESS_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_APP_SECRET
+        sync: false
+      - key: WHATSAPP_WEBHOOK_VERIFY_TOKEN
+        sync: false
+      - key: DEFAULT_PHONE_REGION
+        value: IN
+
+services:
+  - type: web
+    name: smart-queue-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    # Applies pending Alembic migrations before each deploy goes live.
+    preDeployCommand: alembic upgrade head
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers
+    healthCheckPath: /api/health
+    envVars:
+      - fromGroup: smart-queue-shared
+      - key: CORS_ORIGINS
+        sync: false
+
+  - type: worker
+    name: smart-queue-worker
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    # -B embeds the beat scheduler (outbox sweep every 30 s). Run exactly ONE such worker;
+    # scale out with additional workers *without* -B.
+    startCommand: celery -A app.workers.celery_app worker -B --loglevel=info --concurrency=2
+    envVars:
+      - fromGroup: smart-queue-shared

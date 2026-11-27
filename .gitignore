@@ -1,0 +1,28 @@
+# Secrets — never commit real credentials
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+celerybeat-schedule*
+
+# Node
+node_modules/
+dist/
+coverage/
+*.log
+
+# Editors / OS
+.obsidian/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
