@@ -9,6 +9,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    // Never let tests reach the real Supabase project or API configured in .env.local.
+    env: { VITE_SUPABASE_URL: '', VITE_SUPABASE_ANON_KEY: '', VITE_API_URL: 'http://api.invalid' },
     css: false,
   },
 })
